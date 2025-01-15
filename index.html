@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>KNB</title>
+  </head>
+  <body>
+	<div class="container">
+		<div class="ui">
+			<div class="ui__score">
+				<span class="ui__score--name">You</span>
+				<span class="ui__score--player js_primary-player">-</span>
+				<span class="ui__score--devider">:</span>
+				<span class="ui__score--player js_secondary-player">-</span>
+				<span class="ui__score--name">Enemy</span>
+			</div>
+			<h1>Two-Player Game</h1>
+			<!-- <button id="createGame">Create Game</button> -->
+			<p id="gameLink"></p>
+			<!-- <div>
+				<label>Room ID: <span id="roomIdDisplay">Not created</span></label>
+			</div> -->
+			<pre id="gameState">Game State: Not connected</pre>
+		</div>
+		<div class="canvas-container"></div>
+	</div>
+	<script type="module" src="./src/main.js"></script>
+  </body>
+</html>
