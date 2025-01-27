@@ -11,6 +11,7 @@ export class Tile {
 		
 		this.tile = new Container();
 		this.rect = new Graphics();
+		this.overlay = new Graphics();
 		this.icon = new Sprite(Texture.from('/images/b-image.png'));
 
 		this.setType(this.type);
@@ -38,6 +39,29 @@ export class Tile {
 		}
 	}
 
+	toggleIcon(action) {
+		this.overlay.alpha = 0;
+		if(action === 'hide') {
+			this.icon.alpha = 0;
+		}
+		if(action === 'show') {
+			this.icon.alpha = 1;
+		}
+	}
+
+	drawOverlay(color) {
+		this.overlay.fill(color);
+		this.overlay.rect(0, 0, this.size, this.size);
+		this.overlay.fill();
+		this.overlay.x = this.x;
+		this.overlay.y = this.y;
+		this.overlay.width = this.size;
+		this.overlay.height = this.size;
+		this.overlay.alpha = 0.3;
+
+		this.tile.addChild(this.overlay);
+	}
+
 	draw() {
 		if (this.isAction) {
 			this.rect.fill('gray');
@@ -53,8 +77,8 @@ export class Tile {
 			this.icon.x = this.x + 5;
 			this.icon.y = this.y + 5;
 		} else {
-			this.icon.width = 260;
-			this.icon.height = 260;
+			this.icon.width = this.size;
+			this.icon.height = this.size;
 			this.icon.x = this.x;
 			this.icon.y = this.y;
 		}

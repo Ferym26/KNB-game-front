@@ -3,7 +3,10 @@ import { Application, Container, Assets, Sprite, Texture, Graphics } from "pixi.
 
 import { assetsLoader } from './utils/assetsLoader.js';
 import { Player } from './components/Player.js';
+import { Ui } from './components/Ui.js';
 import { ConnectorService } from './services/connectorService.js';
+
+import { gameStateType, gameStateText } from './utils/types.js';
 
 import './styles/style.css';
 
@@ -12,7 +15,7 @@ class KNBgame {
 		this.app = new Application();
 		this.scene = new Container();
 
-		this.gameState = 'pending'; // pending, started, finished
+		this.gameState = gameStateType.pending;
 
 		this.fieldWidth = 760;
 		this.fieldHeight = 280;
@@ -22,19 +25,16 @@ class KNBgame {
 		this.primaryPlayerInstance = null;
 		this.secondaryPlayerInstance = null;
 
-		this.ui = {
-			primaryPlayer: {
-				container: document.querySelector('.js_primary-player'),
-				score: null,
-			},
-			secondaryPlayer: {
-				container: document.querySelector('.js_secondary-player'),
-				score: null,
-			},
-		};
+		this.uiInstance = new Ui();
 
-		this.connectorService = null;
+		this.connectorService = new ConnectorService({
+			currentPlayer: this.currentPlayer,
+		});
+
+		this.resetTime = 3000;
 	}
+
+	// TODO: доработать сценарий когда после начала игры первый юзер отключается и второй должен стать основным и получить возможность делится линкой
 
 	async initView() {
 		await this.app.init({
@@ -57,15 +57,15 @@ class KNBgame {
 	drawPlayers() {
 		this.primaryPlayerInstance = new Player({
 			scene: this.scene,
-			type: 'primary',
+			type: this.currentPlayer,
 			connectorService: this.connectorService,
 		});
+	}
 
-		this.secondaryPlayerInstance = new Player({
-			scene: this.scene,
-			type: 'secondary',
-			connectorService: this.connectorService,
-		});
+	drawScore(data) {
+		this.uiInstance.setScore('primary', data.primePlayerScore);
+		this.uiInstance.setScore('seconadary', data.secondaryPlayerScore);
+		this.uiInstance.renderScore(this.currentPlayer);
 	}
 
 	draw() {
@@ -79,32 +79,41 @@ class KNBgame {
 			});
 	}
 
-	setScore() {
-		this.ui.primaryPlayer.container.textContent = this.ui.primaryPlayer.score;
-		this.ui.secondaryPlayer.container.textContent = this.ui.secondaryPlayer.score;
-	}
-
 	connectorInit() {
 		this.connectorService = new ConnectorService({
 			currentPlayer: this.currentPlayer,
-			ui: this.ui,
 		});
 	}
 
 	connectorCreateGame() {
 		this.connectorService.createGame();
 		this.connectorService.onEvent("gameStart", (data) => {
-			this.ui.primaryPlayer.score = data.primePlayerScore;
-			this.ui.secondaryPlayer.score = data.secondaryPlayerScore;
-			this.setScore();
+			this.drawScore(data);
+			this.uiInstance.setGameStateText(gameStateText.connected);
 		});
 
 		// получение обновленных данных после хода
 		this.connectorService.onEvent("updateState", (data) => {
 			console.log(data);
-			this.ui.primaryPlayer.score = data.primePlayerScore;
-			this.ui.secondaryPlayer.score = data.secondaryPlayerScore;
-			this.setScore();
+			// const move = this.currentPlayer === 'primary' ? data.secondaryPlayerMove : data.primaryPlayerMove;
+			this.primaryPlayerInstance.actionOnMove(data);
+			// this.primaryPlayerInstance.drawEnemyTile(move);
+			// this.primaryPlayerInstance.hightlightTileOnMove(data);
+			this.drawScore(data);
+
+			setTimeout(() => {
+				this.primaryPlayerInstance.clearTiles();
+			}, this.resetTime)
+		});
+
+		// получение эвента при выходе из игры второго игрока
+		this.connectorService.onEvent("userDisconnect", (data) => {
+			console.log(data);
+			this.uiInstance.setGameStateText(gameStateText.pending);
+			this.drawScore({
+				primePlayerScore: '-', // TODO: что-то с этим надо сделать
+				secondaryPlayerScore: '-',
+			});
 		});
 	}
 
@@ -114,6 +123,9 @@ class KNBgame {
 		this.checkCurrentPlayer();
 		this.connectorInit();
 		this.connectorCreateGame();
+
+		this.uiInstance.setCurrentPlayer(this.currentPlayer);
+		this.uiInstance.setGameStateText(gameStateText.pending);
 
 		this.draw();
 	}

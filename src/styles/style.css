@@ -17,6 +17,11 @@ body {
 	grid-gap: 20px;
 }
 
+.ui {
+	display: grid;
+	grid-gap: 10px;
+}
+
 .ui__score {
 	display: flex;
 	justify-content: center;
@@ -29,12 +34,24 @@ body {
 }
 
 .ui__score--player {
-	font-size: 70px;
+	font-size: 60px;
 	font-weight: 700;
+	line-height: 1;
 }
 
 .ui__score--name {
 	font-size: 30px;
+	line-height: 1;
+}
+
+.ui__share-link.is-hidden {
+	display: none;
+}
+
+.ui h1 {
+	text-align: center;
+	font-size: 50px;
+	line-height: 1;
 }
 
 .canvas-container canvas {

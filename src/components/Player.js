@@ -32,14 +32,11 @@ export class Player {
 
 		this.playerContainer = new Container();
 
-		if(this.type === 'primary') {
-			this.playerContainer.position.set(10, 10);
-		} else {
-			this.playerContainer.position.set(380, 10);
-		}
+		this.playerContainer.position.set(10, 10);
 
 		this.actionTiles = [];
 		this.resultTile = null;
+		this.enemyTile = null;
 
 		this.draw();
 	}
@@ -76,6 +73,65 @@ export class Player {
 			size: 260,
 			isAction: false,
 		});
+	}
+
+	actionOnMove(data) {
+		this.drawEnemyTile(data);
+		this.hightlightTileOnMove(data);
+	}
+
+	drawEnemyTile(data) {
+		const type = this.type === 'primary' ? data.secondaryPlayerMove : data.primaryPlayerMove;
+
+		this.enemyTile = new Tile({
+			playerInstance: this,
+			type: type,
+			x: 400,
+			y: 30,
+			size: 200,
+			isAction: false,
+		});
+	}
+
+	hightlightTileOnMove(data) {
+		const result = data.winner;
+		if(this.type === 'primary') {
+			switch (result) {
+				case 'primary':
+					this.resultTile.drawOverlay('green');
+					this.enemyTile.drawOverlay('red');
+					break;
+				case 'secondary':
+					this.resultTile.drawOverlay('red');
+					this.enemyTile.drawOverlay('green');
+					break;
+				default:
+					break;
+			}
+		}
+		if(this.type === 'secondary') {
+			switch (result) {
+				case 'primary':
+					this.resultTile.drawOverlay('red');
+					this.enemyTile.drawOverlay('green');
+					break;
+				case 'secondary':
+					this.resultTile.drawOverlay('green');
+					this.enemyTile.drawOverlay('red');
+					break;
+				default:
+					break;
+			}
+		}
+		if(result === 'draw') {
+			this.resultTile.drawOverlay('orange');
+			this.enemyTile.drawOverlay('orange');
+		}
+	}
+
+	clearTiles() {
+		this.resultTile.toggleIcon('hide');
+		this.enemyTile.toggleIcon('hide');
 	}
 
 	draw() {

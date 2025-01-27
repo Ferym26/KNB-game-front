@@ -1,10 +1,13 @@
 import { io } from 'socket.io-client';
 
+import { Ui } from '../components/Ui.js';
+
 // singleton
 export class ConnectorService {
 	constructor(params) {
 		this.currentPlayer = params.currentPlayer;
-		this.ui = params.ui;
+
+		this.uiInstance = new Ui();
 
 		this.socket = io('http://localhost:4242'); // Укажите ваш сервер
 		this.roomIdLoc = null;
@@ -23,10 +26,7 @@ export class ConnectorService {
 			this.socket.emit('createGame', ({ roomId }) => {
 				this.roomIdLoc = roomId;
 
-				const gameLink = document.createElement('a');
-				gameLink.href = `${window.location.origin}?roomId=${roomId}`;
-				gameLink.textContent = 'Game Link';
-				document.querySelector('#gameLink').appendChild(gameLink);
+				this.uiInstance.createShareLink(roomId);
 			});
 		} else {
 			// Если игрок второй, то присоединяемся к игре

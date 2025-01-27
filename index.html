@@ -9,6 +9,8 @@
   <body>
 	<div class="container">
 		<div class="ui">
+			<h1>KNB Game</h1>
+
 			<div class="ui__score">
 				<span class="ui__score--name">You</span>
 				<span class="ui__score--player js_primary-player">-</span>
@@ -16,13 +18,13 @@
 				<span class="ui__score--player js_secondary-player">-</span>
 				<span class="ui__score--name">Enemy</span>
 			</div>
-			<h1>Two-Player Game</h1>
-			<!-- <button id="createGame">Create Game</button> -->
-			<p id="gameLink"></p>
-			<!-- <div>
-				<label>Room ID: <span id="roomIdDisplay">Not created</span></label>
-			</div> -->
-			<pre id="gameState">Game State: Not connected</pre>
+
+			<div class="ui__game-state">Game State: <span class="js_game-state"></span></div>
+			
+			<div class="ui__share-link js_ui-share is-hidden">
+				<button class="ui__share-link-title">Click to copy link</button>
+				<div class="ui__share-link-title js_game-share-link"></div>
+			</div>
 		</div>
 		<div class="canvas-container"></div>
 	</div>
